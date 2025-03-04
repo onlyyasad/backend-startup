@@ -1,16 +1,35 @@
 import { Schema, model } from 'mongoose'
 import { Guardian, LocalGuardian, Student, UserName } from './student.interface'
+import validator from 'validator'
 
 const userNameSchema = new Schema<UserName>({
   firstName: {
     type: String,
+    minlength: [4, 'First Name must be at least 4 characters long.'],
+    maxlength: [20, 'First Name is too long.'],
     required: [true, 'First name is required'],
+    trim: true,
+    validate: {
+      validator: function (value: string) {
+        const char = value.charAt(0).toUpperCase()
+        const rest = value.slice(1).toLowerCase()
+        const name = char + rest
+        return value === name
+      },
+      message: '{VALUE} is not valid.',
+    },
   },
   middleName: {
     type: String,
   },
   lastName: {
     type: String,
+    validate: {
+      validator: (value: string) => {
+        return validator.isAlpha(value)
+      },
+      message: '{VALUE} is not valid.',
+    },
     required: [true, 'Last name is required'],
   },
 })
@@ -86,6 +105,12 @@ const studentSchema = new Schema<Student>({
   email: {
     type: String,
     required: [true, 'Email is required'],
+    validate: {
+      validator: (value: string) => {
+        return validator.isEmail(value)
+      },
+      message: '{VALUE} is not a valid email.',
+    },
   },
   contactNo: {
     type: String,
