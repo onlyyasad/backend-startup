@@ -1,63 +1,63 @@
-import { Schema, model, connect } from 'mongoose'
+import { Schema, model } from 'mongoose'
 import { Guardian, LocalGuardian, Student, UserName } from './student.interface'
 
 const userNameSchema = new Schema<UserName>({
   firstName: {
     type: String,
-    required: true,
+    required: [true, 'First name is required'],
   },
   middleName: {
     type: String,
   },
   lastName: {
     type: String,
-    required: true,
+    required: [true, 'Last name is required'],
   },
 })
 
 const guardianSchema = new Schema<Guardian>({
   fatherName: {
     type: String,
-    required: true,
+    required: [true, 'Father name is required'],
   },
   fatherOccupation: {
     type: String,
-    required: true,
+    required: [true, 'Father occupation is required'],
   },
   fatherContactNo: {
     type: String,
-    required: true,
+    required: [true, 'Father contact number is required'],
   },
   motherName: {
     type: String,
-    required: true,
+    required: [true, 'Mother name is required'],
   },
   motherOccupation: {
     type: String,
-    required: true,
+    required: [true, 'Mother occupation is required'],
   },
   motherContactNo: {
     type: String,
-    required: true,
+    required: [true, 'Mother contact number is required'],
   },
 })
 
 const localGuardianSchema = new Schema<LocalGuardian>({
   name: {
     type: String,
-    required: true,
+    required: [true, 'Local guardian name is required'],
   },
   occupation: {
     type: String,
-    required: true,
+    required: [true, 'Local guardian occupation is required'],
   },
   contactNo: {
     type: String,
-    required: true,
+    required: [true, 'Local guardian contact number is required'],
   },
   address: {
     type: String,
-    required: true,
+    required: [true, 'Local guardian address is required'],
   },
 })
 
@@ -65,11 +65,11 @@ const studentSchema = new Schema<Student>({
   id: {
     type: String,
     unique: true,
-    required: [true, 'Id is required.'],
+    required: [true, 'Student ID is required'],
   },
   name: {
     type: userNameSchema,
-    required: [true, 'Name is required'],
+    required: [true, 'Student name is required'],
   },
   gender: {
     type: String,
@@ -85,15 +85,15 @@ const studentSchema = new Schema<Student>({
   },
   email: {
     type: String,
-    required: true,
+    required: [true, 'Email is required'],
   },
   contactNo: {
     type: String,
-    required: true,
+    required: [true, 'Contact number is required'],
   },
   emergencyContactNo: {
     type: String,
-    required: true,
+    required: [true, 'Emergency contact number is required'],
   },
   bloodGroup: {
     type: String,
@@ -106,19 +106,19 @@ const studentSchema = new Schema<Student>({
   },
   presentAddress: {
     type: String,
-    required: true,
+    required: [true, 'Present address is required'],
   },
   permanentAddress: {
     type: String,
-    required: true,
+    required: [true, 'Permanent address is required'],
   },
   guardian: {
     type: guardianSchema,
-    required: [true, 'Guardian is required'],
+    required: [true, 'Guardian information is required'],
   },
   localGuardian: {
     type: localGuardianSchema,
-    required: [true, 'Local guardian is required'],
+    required: [true, 'Local guardian information is required'],
   },
   profileImg: {
     type: String,
