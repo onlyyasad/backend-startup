@@ -64,13 +64,20 @@ const localGuardianSchema = new Schema<LocalGuardian>({
 const studentSchema = new Schema<Student>({
   id: {
     type: String,
+    unique: true,
+    required: [true, 'Id is required.'],
   },
   name: {
     type: userNameSchema,
     required: [true, 'Name is required'],
   },
   gender: {
-    enum: ['male', 'female', 'other'],
+    type: String,
+    enum: {
+      values: ['male', 'female', 'other'],
+      message:
+        "{VALUE} is not supported, use 'male', 'female' or 'other' instead",
+    },
     required: [true, 'Gender is required'],
   },
   dateOfBirth: {
@@ -89,7 +96,12 @@ const studentSchema = new Schema<Student>({
     required: true,
   },
   bloodGroup: {
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    type: String,
+    enum: {
+      values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      message:
+        "{VALUE} is not supported, please use 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', or 'O-' instead",
+    },
     required: [true, 'Blood group is required'],
   },
   presentAddress: {
@@ -112,7 +124,11 @@ const studentSchema = new Schema<Student>({
     type: String,
   },
   isActive: {
-    enum: ['active', 'blocked'],
+    type: String,
+    enum: {
+      values: ['active', 'blocked'],
+      message: "{VALUE} is not supported, use 'active' or 'blocked' instead.",
+    },
     default: 'active',
   },
 })
