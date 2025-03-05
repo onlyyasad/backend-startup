@@ -2,7 +2,9 @@ import { Student } from './student.interface'
 import { StudentModel } from './student.model'
 
 const createStudentIntoDB = async (student: Student) => {
-  const result = await StudentModel.create(student)
+  // const result = await StudentModel.create(student)
+  const studentModel = new StudentModel(student)
+  const result = await studentModel.save()
   return result
 }
 
