@@ -7,6 +7,8 @@ import {
   TUserName,
 } from './student.interface'
 import validator from 'validator'
+import bcrypt from 'bcrypt'
+import config from '../../config'
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -92,6 +94,11 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
     unique: true,
     required: [true, 'Student ID is required'],
   },
+  password: {
+    type: String,
+    maxlength: [20, 'Password is too long.'],
+    required: true,
+  },
   name: {
     type: userNameSchema,
     required: [true, 'Student name is required'],
@@ -168,5 +175,20 @@ studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id })
   return existingUser
 }
+
+studentSchema.pre('save', async function (next) {
+  const student = this
+  student.password = await bcrypt.hash(
+    student.password,
+    Number(config.bcrypt_salt_rounds),
+  )
+  next()
+})
+
+studentSchema.post('save', async function (doc, next) {
+  const student = doc
+  student.password = ''
+  next()
+})
 
 export const Student = model<TStudent, TStudentModel>('Student', studentSchema)
