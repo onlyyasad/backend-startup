@@ -169,6 +169,10 @@ const studentSchema = new Schema<TStudent, TStudentModel>({
     },
     default: 'active',
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 studentSchema.statics.isUserExists = async function (id: string) {
