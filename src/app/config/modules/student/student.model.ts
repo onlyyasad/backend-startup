@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose'
 import {
-  IStudentMethods,
   TGuardian,
   TLocalGuardian,
   TStudent,
@@ -87,7 +86,7 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
   },
 })
 
-const studentSchema = new Schema<TStudent, TStudentModel, IStudentMethods>({
+const studentSchema = new Schema<TStudent, TStudentModel>({
   id: {
     type: String,
     unique: true,
@@ -165,7 +164,7 @@ const studentSchema = new Schema<TStudent, TStudentModel, IStudentMethods>({
   },
 })
 
-studentSchema.methods.isUserExists = async function (id: string) {
+studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id })
   return existingUser
 }

@@ -39,12 +39,6 @@ export type TStudent = {
   isActive: 'active' | 'blocked'
 }
 
-export interface IStudentMethods {
+export interface TStudentModel extends Model<TStudent> {
   isUserExists(id: string): Promise<TStudent | null>
 }
-
-export type TStudentModel = Model<
-  TStudent,
-  Record<string, never>,
-  IStudentMethods
->
