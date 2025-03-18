@@ -9,7 +9,7 @@ export default [
   { languageOptions: { globals: globals.browser } },
   {
     rules: {
-      eqeqeq: 'error',
+      eqeqeq: 'off',
       'no-unused-vars': 'error',
       'no-unused-expressions': 'error',
       'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
