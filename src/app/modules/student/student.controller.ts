@@ -1,7 +1,7 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { StudentServices } from './student.service'
 
-const getStudents = async (req: Request, res: Response) => {
+const getStudents = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await StudentServices.getAllStudentFromDB()
     res.status(200).json({
@@ -9,16 +9,16 @@ const getStudents = async (req: Request, res: Response) => {
       message: 'Students are retrieved successfully!',
       data: result,
     })
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Something went wrong!',
-      error,
-    })
+  } catch (error) {
+    next(error)
   }
 }
 
-const getSingleStudent = async (req: Request, res: Response) => {
+const getSingleStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params
     const result = await StudentServices.getSingleStudentFromDB(studentId)
@@ -27,16 +27,16 @@ const getSingleStudent = async (req: Request, res: Response) => {
       message: 'Student is retrieved successfully!',
       data: result,
     })
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Something went wrong!',
-      error,
-    })
+  } catch (error) {
+    next(error)
   }
 }
 
-const deleteSingleStudent = async (req: Request, res: Response) => {
+const deleteSingleStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params
     const result = await StudentServices.deleteSingleStudentFromDB(studentId)
@@ -45,12 +45,8 @@ const deleteSingleStudent = async (req: Request, res: Response) => {
       message: 'Student is deleted successfully!',
       data: result,
     })
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Something went wrong!',
-      error,
-    })
+  } catch (error) {
+    next(error)
   }
 }
 

@@ -1,7 +1,8 @@
-import express, { Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import cors from 'cors'
 import { StudentRoutes } from './app/modules/student/student.route'
 import { UserRoutes } from './app/modules/user/user.route'
+import globalErrorHandler from './app/middlewares/globalErrorHandler'
 
 const app = express()
 
@@ -18,5 +19,7 @@ app.get('/', (req: Request, res: Response) => {
   const a = 'Hello World!'
   res.send(a)
 })
+
+app.use(globalErrorHandler)
 
 export default app
