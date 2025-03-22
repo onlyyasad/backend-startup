@@ -10,7 +10,14 @@ export default [
   {
     rules: {
       eqeqeq: 'off',
-      'no-unused-vars': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       'no-unused-expressions': 'error',
       'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
       'no-console': 'warn',

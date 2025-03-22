@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express'
+import AppError from '../errors/appError'
 
 const globalErrorHandler = (
-  error: Error,
+  error: AppError,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
-  const statusCode = 500
+  const statusCode = error.statusCode || 500
   const message = 'Something went wrong!'
 
   res.status(statusCode).json({
