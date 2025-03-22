@@ -3,6 +3,7 @@ import { AcademicDepartment } from './academicDepartment.model'
 
 const createAcademicDepartmentIntoDB = async (payload: TAcademicDepartment) => {
   //create an academic department
+
   const newAcademicDepartment = await AcademicDepartment.create(payload)
 
   return newAcademicDepartment
