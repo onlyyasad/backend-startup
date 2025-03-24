@@ -19,6 +19,7 @@ async function main() {
 
 main()
 
+// Error handling for asynchronous process
 process.on('unhandledRejection', () => {
   console.log('unhandledRejection is detected, shutting down the server ...')
   if (server) {
@@ -29,6 +30,7 @@ process.on('unhandledRejection', () => {
   process.exit(1)
 })
 
+// Error handling for error from developers logic
 process.on('uncaughtException', () => {
   console.log('uncaughtException is detected, shutting down the server ...')
 
