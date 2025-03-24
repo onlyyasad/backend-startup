@@ -1,9 +1,11 @@
 import { TErrorSources, TGenericErrorResponse } from '../interface/error'
 
-const handleDuplicateError = (error): TGenericErrorResponse => {
+const handleDuplicateError = (
+  error: Partial<{ message: string }>,
+): TGenericErrorResponse => {
   const statusCode = 400
 
-  const match = error.message.match(/"([^"]*)"/)
+  const match = error?.message?.match(/"([^"]*)"/)
 
   const extractedMessage = match && match[1]
 
