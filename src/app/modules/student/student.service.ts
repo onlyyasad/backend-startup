@@ -8,68 +8,17 @@ import QueryBuilder from '../../builder/QueryBuilder'
 import { studentSearchableFields } from './student.constant'
 
 const getAllStudentFromDB = async (query: Record<string, unknown>) => {
-  // const queryObj = { ...query }
-  // const studentSearchableFields = ['email', 'name.firstName', 'presentAddress']
-  // let searchTerm = ''
-  // if (query.searchTerm) {
-  //   searchTerm = query.searchTerm as string
-  // }
-
-  // const searchQuery = Student.find({
-  //   $or: studentSearchableFields.map((field) => ({
-  //     [field]: { $regex: searchTerm, $options: 'i' },
-  //   })),
-  // })
-
-  // //filtering
-  // const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields']
-  // excludeFields.forEach((el) => delete queryObj[el])
-
-  // console.log({ query }, { queryObj })
-  // const filterQuery = searchQuery
-  //   .find(queryObj)
-  //   .populate({
-  //     path: 'academicDepartment',
-  //     populate: {
-  //       path: 'academicFaculty',
-  //     },
-  //   })
-  //   .populate('admissionSemester')
-
-  // let sort = '-createdAt'
-  // if (query.sort) {
-  //   sort = query.sort as string
-  // }
-
-  // const sortQuery = filterQuery.sort(sort)
-
-  // let page = 1
-  // let limit = 1
-  // let skip = 0
-
-  // if (query.limit) {
-  //   limit = Number(query.limit)
-  // }
-
-  // if (query.page) {
-  //   page = Number(query.page)
-  //   skip = (page - 1) * limit
-  // }
-
-  // const paginateQuery = sortQuery.skip(skip)
-
-  // const limitQuery = paginateQuery.limit(limit)
-
-  //field limiting
-  // let fields = '-__v'
-
-  // if (query.fields) {
-  //   fields = (query.fields as string).split(',').join(' ')
-  // }
-
-  // const fieldQuery = await limitQuery.select(fields)
-
-  const studentQuery = new QueryBuilder(Student.find(), query)
+  const studentQuery = new QueryBuilder(
+    Student.find()
+      .populate({
+        path: 'academicDepartment',
+        populate: {
+          path: 'academicFaculty',
+        },
+      })
+      .populate('admissionSemester'),
+    query,
+  )
     .search(studentSearchableFields)
     .filter()
     .sort()
