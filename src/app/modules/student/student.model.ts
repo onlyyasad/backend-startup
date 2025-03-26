@@ -181,7 +181,13 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
 )
 
 studentSchema.virtual('fullName').get(function () {
-  return this.name.firstName + ' ' + this.name.lastName
+  return (
+    this?.name?.firstName +
+    ' ' +
+    this?.name?.middleName +
+    ' ' +
+    this?.name?.lastName
+  )
 })
 
 studentSchema.statics.isUserExists = async function (id: string) {
