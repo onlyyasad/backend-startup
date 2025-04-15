@@ -5,9 +5,11 @@ import { TStudent } from '../student/student.interface'
 import { Student } from '../student/student.model'
 import { TUser } from './user.interface'
 import { User } from './user.model'
-import { generateStudentId } from './user.utils'
+import { generateFacultyId, generateStudentId } from './user.utils'
 import AppError from '../../errors/appError'
 import { status as httpStatus } from 'http-status'
+import { TFaculty } from '../faculty/faculty.interface'
+import { Faculty } from '../faculty/faculty.model'
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   //create a user object
@@ -60,30 +62,24 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   }
 }
 
-const createFacultyIntoDB = async (password: string, payload: TStudent) => {
+const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   //create a user object
   const userData: Partial<TUser> = {}
 
   userData.password = password || (config.default_password as string)
 
-  //set student role
-  userData.role = 'student'
-
-  //set manually generated id
-
-  const admissionSemester = await AcademicSemester.findById(
-    payload.admissionSemester,
-  )
+  //set faculty role
+  userData.role = 'faculty'
 
   const session = await mongoose.startSession()
   try {
     session.startTransaction()
-    userData.id = await generateStudentId(admissionSemester)
+    userData.id = await generateFacultyId()
 
     //create a user (---- Transaction 1 -----)
     const newUser = await User.create([userData], { session })
 
-    // create a student
+    // create a faculty
 
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user.')
@@ -92,22 +88,22 @@ const createFacultyIntoDB = async (password: string, payload: TStudent) => {
     payload.id = newUser[0].id //embedding id
     payload.user = newUser[0]._id //reference id
 
-    //create a student (---- Transaction 2 -----)
+    //create a faculty (---- Transaction 2 -----)
 
-    const newStudent = await Student.create([payload], { session })
+    const newFaculty = await Faculty.create([payload], { session })
 
-    if (!newStudent.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student.')
+    if (!newFaculty.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create faculty.')
     }
 
     await session.commitTransaction()
     await session.endSession()
 
-    return newStudent[0]
+    return newFaculty[0]
   } catch (_error) {
     await session.abortTransaction()
     await session.endSession()
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student.')
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create faculty.')
   }
 }
 

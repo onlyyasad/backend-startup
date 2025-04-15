@@ -18,14 +18,14 @@ const createStudent: RequestHandler = catchAsync(async (req, res) => {
 })
 
 const createFaculty: RequestHandler = catchAsync(async (req, res) => {
-  const { password, student: studentData } = req.body
+  const { password, faculty: facultyData } = req.body
 
-  const result = await UserServices.createFacultyIntoDB(password, studentData)
+  const result = await UserServices.createFacultyIntoDB(password, facultyData)
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Student created successfully!',
+    message: 'Faculty created successfully!',
     data: result,
   })
 })
