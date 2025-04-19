@@ -19,9 +19,9 @@ const userNameSchema = new Schema<TUserName>({
       message: '{VALUE} is not valid.',
     },
   },
-  middleName: {
-    type: String,
-  },
+  // middleName: {
+  //   type: String,
+  // },
   lastName: {
     type: String,
     validate: {
