@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 import validator from 'validator'
-import { TFaculty, TFacultyModel, TUserName } from './faculty.interface'
-import { BloodGroup, Gender } from './faculty.constant'
+import { TAdmin, TAdminModel, TUserName } from './admin.interface'
+import { BloodGroup, Gender } from './admin.constant'
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -35,12 +35,12 @@ const userNameSchema = new Schema<TUserName>({
   },
 })
 
-const facultySchema = new Schema<TFaculty, TFacultyModel>(
+const adminSchema = new Schema<TAdmin, TAdminModel>(
   {
     id: {
       type: String,
       unique: true,
-      required: [true, 'Faculty ID is required'],
+      required: [true, 'Admin ID is required'],
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -54,7 +54,7 @@ const facultySchema = new Schema<TFaculty, TFacultyModel>(
     },
     name: {
       type: userNameSchema,
-      required: [true, 'Faculty name is required'],
+      required: [true, 'Admin name is required'],
     },
     gender: {
       type: String,
@@ -105,14 +105,6 @@ const facultySchema = new Schema<TFaculty, TFacultyModel>(
     profileImg: {
       type: String,
     },
-    academicDepartment: {
-      type: Schema.Types.ObjectId,
-      ref: 'AcademicDepartment',
-    },
-    academicFaculty: {
-      type: Schema.Types.ObjectId,
-      ref: 'AcademicFaculty',
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -123,7 +115,7 @@ const facultySchema = new Schema<TFaculty, TFacultyModel>(
   },
 )
 
-facultySchema.virtual('fullName').get(function () {
+adminSchema.virtual('fullName').get(function () {
   return (
     this?.name?.firstName +
     ' ' +
@@ -133,24 +125,24 @@ facultySchema.virtual('fullName').get(function () {
   )
 })
 
-facultySchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await Faculty.findOne({ id })
+adminSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await Admin.findOne({ id })
   return existingUser
 }
 
-facultySchema.pre('findOne', async function (next) {
+adminSchema.pre('findOne', async function (next) {
   this.findOne({ isDeleted: { $ne: true } })
   next()
 })
 
-facultySchema.pre('find', async function (next) {
+adminSchema.pre('find', async function (next) {
   this.find({ isDeleted: { $ne: true } })
   next()
 })
 
-facultySchema.pre('aggregate', async function (next) {
+adminSchema.pre('aggregate', async function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } })
   next()
 })
 
-export const Faculty = model<TFaculty, TFacultyModel>('Faculty', facultySchema)
+export const Admin = model<TAdmin, TAdminModel>('Admin', adminSchema)
