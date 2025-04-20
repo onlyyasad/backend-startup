@@ -3,7 +3,7 @@ import { z } from 'zod'
 const createUserNameValidationSchema = z.object({
   firstName: z
     .string()
-    .min(4, 'First Name must be at least 4 characters long.')
+    .min(3, 'First Name must be at least 3 characters long.')
     .max(20, 'First Name is too long.')
     .refine(
       (value) => {

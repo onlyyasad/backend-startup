@@ -11,7 +11,7 @@ import validator from 'validator'
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
-    minlength: [4, 'First Name must be at least 4 characters long.'],
+    minlength: [3, 'First Name must be at least 3 characters long.'],
     maxlength: [20, 'First Name is too long.'],
     required: [true, 'First name is required'],
     trim: true,
