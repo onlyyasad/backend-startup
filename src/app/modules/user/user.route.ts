@@ -2,6 +2,7 @@ import express from 'express'
 import { UserControllers } from './user.controller'
 import { studentValidations } from '../student/student.validation'
 import validateRequest from '../../middlewares/validateRequest'
+import { facultyValidations } from '../faculty/faculty.validation'
 
 const router = express.Router()
 
@@ -13,8 +14,8 @@ router.post(
 
 router.post(
   '/create-faculty',
-  validateRequest(studentValidations.createStudentValidationSchema),
-  UserControllers.createStudent,
+  validateRequest(facultyValidations.createFacultyValidationSchema),
+  UserControllers.createFaculty,
 )
 
 export const UserRoutes = router
