@@ -54,7 +54,7 @@ const updateSingleFaculty = catchAsync(async (req, res) => {
   })
 })
 
-export const StudentControllers = {
+export const FacultyControllers = {
   getFaculties,
   getSingleFaculty,
   deleteSingleFaculty,
