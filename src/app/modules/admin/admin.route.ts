@@ -5,13 +5,13 @@ import { adminValidations } from './admin.validation'
 
 const router = express.Router()
 
-router.get('/', AdminControllers.getFaculties)
-router.get('/:facultyId', AdminControllers.getSingleFaculty)
+router.get('/', AdminControllers.getAdmins)
+router.get('/:adminId', AdminControllers.getSingleAdmin)
 router.patch(
-  '/:facultyId',
-  validateRequest(adminValidations.updateFacultyValidationSchema),
-  AdminControllers.updateSingleFaculty,
+  '/:adminId',
+  validateRequest(adminValidations.updateAdminValidationSchema),
+  AdminControllers.updateSingleAdmin,
 )
-router.delete('/:facultyId', AdminControllers.deleteSingleFaculty)
+router.delete('/:adminId', AdminControllers.deleteSingleAdmin)
 
 export const FacultyRoutes = router
