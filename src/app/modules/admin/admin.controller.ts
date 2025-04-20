@@ -3,60 +3,57 @@ import { status as httpStatus } from 'http-status'
 import catchAsync from '../../utils/catchAsync'
 import { AdminServices } from './admin.service'
 
-const getFaculties = catchAsync(async (req, res) => {
-  const result = await AdminServices.getAllFacultyFromDB(req.query)
+const getAdmins = catchAsync(async (req, res) => {
+  const result = await AdminServices.getAllAdminFromDB(req.query)
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Faculties are retrieved successfully!',
+    message: 'Admins are retrieved successfully!',
     data: result,
   })
 })
 
-const getSingleFaculty = catchAsync(async (req, res) => {
-  const { facultyId } = req.params
-  const result = await AdminServices.getSingleFacultyFromDB(facultyId)
+const getSingleAdmin = catchAsync(async (req, res) => {
+  const { adminId } = req.params
+  const result = await AdminServices.getSingleAdminFromDB(adminId)
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Faculty is retrieved successfully!',
+    message: 'Admin is retrieved successfully!',
     data: result,
   })
 })
 
-const deleteSingleFaculty = catchAsync(async (req, res) => {
-  const { facultyId } = req.params
-  const result = await AdminServices.deleteSingleFacultyFromDB(facultyId)
+const deleteSingleAdmin = catchAsync(async (req, res) => {
+  const { adminId } = req.params
+  const result = await AdminServices.deleteSingleAdminFromDB(adminId)
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Faculty is deleted successfully!',
+    message: 'Admin is deleted successfully!',
     data: result,
   })
 })
 
-const updateSingleFaculty = catchAsync(async (req, res) => {
-  const { facultyId } = req.params
-  const { faculty } = req.body
-  const result = await AdminServices.updateSingleFacultyIntoDB(
-    facultyId,
-    faculty,
-  )
+const updateSingleAdmin = catchAsync(async (req, res) => {
+  const { adminId } = req.params
+  const { admin } = req.body
+  const result = await AdminServices.updateSingleAdminIntoDB(adminId, admin)
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Faculty is updated successfully!',
+    message: 'Admin is updated successfully!',
     data: result,
   })
 })
 
-export const FacultyControllers = {
-  getFaculties,
-  getSingleFaculty,
-  deleteSingleFaculty,
-  updateSingleFaculty,
+export const AdminControllers = {
+  getAdmins,
+  getSingleAdmin,
+  deleteSingleAdmin,
+  updateSingleAdmin,
 }

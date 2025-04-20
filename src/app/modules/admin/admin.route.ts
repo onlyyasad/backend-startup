@@ -1,17 +1,17 @@
 import express from 'express'
 import validateRequest from '../../middlewares/validateRequest'
-import { FacultyControllers } from './admin.controller'
+import { AdminControllers } from './admin.controller'
 import { adminValidations } from './admin.validation'
 
 const router = express.Router()
 
-router.get('/', FacultyControllers.getFaculties)
-router.get('/:facultyId', FacultyControllers.getSingleFaculty)
+router.get('/', AdminControllers.getFaculties)
+router.get('/:facultyId', AdminControllers.getSingleFaculty)
 router.patch(
   '/:facultyId',
   validateRequest(adminValidations.updateFacultyValidationSchema),
-  FacultyControllers.updateSingleFaculty,
+  AdminControllers.updateSingleFaculty,
 )
-router.delete('/:facultyId', FacultyControllers.deleteSingleFaculty)
+router.delete('/:facultyId', AdminControllers.deleteSingleFaculty)
 
 export const FacultyRoutes = router
