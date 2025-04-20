@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { BloodGroup, Gender } from './student.constant'
 
 const createUserNameValidationSchema = z.object({
   firstName: z
@@ -45,20 +46,14 @@ const createStudentValidationSchema = z.object({
     password: z.string().max(20),
     student: z.object({
       name: createUserNameValidationSchema,
-      gender: z.enum(['male', 'female', 'other'], {
-        errorMap: () => ({
-          message: "Gender must be 'male', 'female', or 'other'.",
-        }),
-      }),
+      gender: z.enum([...Gender] as [string, ...string[]]),
       dateOfBirth: z.string().optional(),
       email: z.string().email('Invalid email'),
       contactNo: z.string().min(1, 'Contact number is required'),
       emergencyContactNo: z
         .string()
         .min(1, 'Emergency contact number is required'),
-      bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
-        errorMap: () => ({ message: 'Invalid blood group.' }),
-      }),
+      bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
       presentAddress: z.string().min(1, 'Present address is required'),
       permanentAddress: z.string().min(1, 'Permanent address is required'),
       guardian: createGuardianValidationSchema,
@@ -74,13 +69,7 @@ const updateStudentValidationSchema = z.object({
   body: z.object({
     student: z.object({
       name: updateUserNameValidationSchema.optional(),
-      gender: z
-        .enum(['male', 'female', 'other'], {
-          errorMap: () => ({
-            message: "Gender must be 'male', 'female', or 'other'.",
-          }),
-        })
-        .optional(),
+      gender: z.enum([...Gender] as [string, ...string[]]).optional(),
       dateOfBirth: z.string().optional(),
       email: z.string().email('Invalid email').optional(),
       contactNo: z.string().min(1, 'Contact number is required').optional(),
@@ -88,11 +77,7 @@ const updateStudentValidationSchema = z.object({
         .string()
         .min(1, 'Emergency contact number is required')
         .optional(),
-      bloodGroup: z
-        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
-          errorMap: () => ({ message: 'Invalid blood group.' }),
-        })
-        .optional(),
+      bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
       presentAddress: z
         .string()
         .min(1, 'Present address is required')

@@ -7,6 +7,7 @@ import {
   TUserName,
 } from './student.interface'
 import validator from 'validator'
+import { BloodGroup, Gender } from './student.constant'
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -106,9 +107,8 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
     gender: {
       type: String,
       enum: {
-        values: ['male', 'female', 'other'],
-        message:
-          "{VALUE} is not supported, use 'male', 'female' or 'other' instead",
+        values: Gender,
+        message: '{VALUE} is not a valid gender',
       },
       required: [true, 'Gender is required'],
     },
@@ -137,9 +137,8 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
     bloodGroup: {
       type: String,
       enum: {
-        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-        message:
-          "{VALUE} is not supported, please use 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', or 'O-' instead",
+        values: BloodGroup,
+        message: '{VALUE} is not a valid blood group',
       },
       required: [true, 'Blood group is required'],
     },

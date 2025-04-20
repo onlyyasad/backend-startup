@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { BloodGroup } from './faculty.constant'
 
 const createUserNameValidationSchema = z.object({
   firstName: z
@@ -36,6 +37,7 @@ const createFacultyValidationSchema = z.object({
       emergencyContactNo: z
         .string()
         .min(1, 'Emergency contact number is required'),
+      bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
       presentAddress: z.string().min(1, 'Present address is required'),
       permanentAddress: z.string().min(1, 'Permanent address is required'),
       academicDepartment: z.string(),
@@ -64,6 +66,7 @@ const updateFacultyValidationSchema = z.object({
         .string()
         .min(1, 'Emergency contact number is required')
         .optional(),
+      bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]).optional(),
       presentAddress: z
         .string()
         .min(1, 'Present address is required')

@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose'
 import validator from 'validator'
 import { TFaculty, TFacultyModel, TUserName } from './faculty.interface'
+import { BloodGroup, Gender } from './faculty.constant'
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -58,7 +59,7 @@ const facultySchema = new Schema<TFaculty, TFacultyModel>(
     gender: {
       type: String,
       enum: {
-        values: ['male', 'female', 'other'],
+        values: Gender,
         message:
           "{VALUE} is not supported, use 'male', 'female' or 'other' instead",
       },
@@ -85,6 +86,13 @@ const facultySchema = new Schema<TFaculty, TFacultyModel>(
     emergencyContactNo: {
       type: String,
       required: [true, 'Emergency contact number is required'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: {
+        values: BloodGroup,
+        message: '{VALUE} is not a valid blood group',
+      },
     },
     presentAddress: {
       type: String,
