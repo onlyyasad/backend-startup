@@ -3,52 +3,35 @@ import AppError from '../../errors/appError'
 import { status as httpStatus } from 'http-status'
 import { User } from '../user/user.model'
 import QueryBuilder from '../../builder/QueryBuilder'
-import { Faculty } from './admin.model'
 import { facultySearchableFields } from './admin.constant'
 import { TAdmin } from './admin.interface'
+import { Admin } from './admin.model'
 
-const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
-  const facultyQuery = new QueryBuilder(
-    Faculty.find()
-      .populate({
-        path: 'academicDepartment',
-        populate: {
-          path: 'academicFaculty',
-        },
-      })
-      .populate('academicFaculty'),
-    query,
-  )
+const getAllAdminFromDB = async (query: Record<string, unknown>) => {
+  const adminQuery = new QueryBuilder(Admin.find(), query)
     .search(facultySearchableFields)
     .filter()
     .sort()
     .paginate()
     .fields()
 
-  const result = await facultyQuery.modelQuery
+  const result = await adminQuery.modelQuery
 
   return result
 }
 
-const getSingleFacultyFromDB = async (id: string) => {
-  const result = await Faculty.findOne({ id })
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    })
-    .populate('academicFaculty')
+const getSingleAdminFromDB = async (id: string) => {
+  const result = await Admin.findOne({ id })
   return result
 }
 
-const updateSingleFacultyIntoDB = async (
+const updateSingleAdminIntoDB = async (
   id: string,
   payload: Partial<TAdmin>,
 ) => {
-  const { name, ...restFacultyData } = payload
+  const { name, ...restAdminData } = payload
 
-  const modifiedUpdatedData: Record<string, unknown> = { ...restFacultyData }
+  const modifiedUpdatedData: Record<string, unknown> = { ...restAdminData }
 
   if (name && Object.keys(name).length) {
     for (const [key, value] of Object.entries(name)) {
@@ -56,33 +39,26 @@ const updateSingleFacultyIntoDB = async (
     }
   }
 
-  const result = await Faculty.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Admin.findOneAndUpdate({ id }, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   })
   return result
 }
 
-const deleteSingleFacultyFromDB = async (id: string) => {
+const deleteSingleAdminFromDB = async (id: string) => {
   const session = await mongoose.startSession()
   try {
     session.startTransaction()
 
-    const deletedFaculty = await Faculty.findOneAndUpdate(
+    const deletedAdmin = await Admin.findOneAndUpdate(
       { id },
       { isDeleted: true },
       { new: true, session },
     )
-      .populate({
-        path: 'academicDepartment',
-        populate: {
-          path: 'academicFaculty',
-        },
-      })
-      .populate('academicFaculty')
 
-    if (!deletedFaculty) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete faculty.')
+    if (!deletedAdmin) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete admin.')
     }
 
     const deletedUser = await User.findOneAndUpdate(
@@ -97,17 +73,17 @@ const deleteSingleFacultyFromDB = async (id: string) => {
     await session.commitTransaction()
     await session.endSession()
 
-    return deletedFaculty
+    return deletedAdmin
   } catch (_error) {
     await session.abortTransaction()
     await session.endSession()
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete faculty.')
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete admin.')
   }
 }
 
-export const FacultyServices = {
-  getAllFacultyFromDB,
-  getSingleFacultyFromDB,
-  updateSingleFacultyIntoDB,
-  deleteSingleFacultyFromDB,
+export const AdminServices = {
+  getAllAdminFromDB,
+  getSingleAdminFromDB,
+  updateSingleAdminIntoDB,
+  deleteSingleAdminFromDB,
 }

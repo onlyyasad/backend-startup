@@ -1,10 +1,10 @@
 import sendResponse from '../../utils/sendResponse'
 import { status as httpStatus } from 'http-status'
 import catchAsync from '../../utils/catchAsync'
-import { FacultyServices } from './admin.service'
+import { AdminServices } from './admin.service'
 
 const getFaculties = catchAsync(async (req, res) => {
-  const result = await FacultyServices.getAllFacultyFromDB(req.query)
+  const result = await AdminServices.getAllFacultyFromDB(req.query)
 
   sendResponse(res, {
     success: true,
@@ -16,7 +16,7 @@ const getFaculties = catchAsync(async (req, res) => {
 
 const getSingleFaculty = catchAsync(async (req, res) => {
   const { facultyId } = req.params
-  const result = await FacultyServices.getSingleFacultyFromDB(facultyId)
+  const result = await AdminServices.getSingleFacultyFromDB(facultyId)
 
   sendResponse(res, {
     success: true,
@@ -28,7 +28,7 @@ const getSingleFaculty = catchAsync(async (req, res) => {
 
 const deleteSingleFaculty = catchAsync(async (req, res) => {
   const { facultyId } = req.params
-  const result = await FacultyServices.deleteSingleFacultyFromDB(facultyId)
+  const result = await AdminServices.deleteSingleFacultyFromDB(facultyId)
 
   sendResponse(res, {
     success: true,
@@ -41,7 +41,7 @@ const deleteSingleFaculty = catchAsync(async (req, res) => {
 const updateSingleFaculty = catchAsync(async (req, res) => {
   const { facultyId } = req.params
   const { faculty } = req.body
-  const result = await FacultyServices.updateSingleFacultyIntoDB(
+  const result = await AdminServices.updateSingleFacultyIntoDB(
     facultyId,
     faculty,
   )
