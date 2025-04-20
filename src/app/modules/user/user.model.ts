@@ -45,9 +45,8 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-userSchema.post('save', async function (doc, next) {
-  const student = doc
-  student.password = ''
+userSchema.post('save', function (doc, next) {
+  doc.password = ''
   next()
 })
 
