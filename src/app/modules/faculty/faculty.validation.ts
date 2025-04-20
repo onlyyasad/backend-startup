@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { BloodGroup } from './faculty.constant'
+import { BloodGroup, Gender } from './faculty.constant'
 
 const createUserNameValidationSchema = z.object({
   firstName: z
@@ -26,11 +26,7 @@ const createFacultyValidationSchema = z.object({
     faculty: z.object({
       name: createUserNameValidationSchema,
       designation: z.string().min(1, 'Designation is required'),
-      gender: z.enum(['male', 'female', 'other'], {
-        errorMap: () => ({
-          message: "Gender must be 'male', 'female', or 'other'.",
-        }),
-      }),
+      gender: z.enum([...Gender] as [string, ...string[]]),
       dateOfBirth: z.string().optional(),
       email: z.string().email('Invalid email'),
       contactNo: z.string().min(1, 'Contact number is required'),
@@ -52,13 +48,7 @@ const updateFacultyValidationSchema = z.object({
     faculty: z.object({
       name: updateUserNameValidationSchema.optional(),
       designation: z.string().min(1, 'Designation is required').optional(),
-      gender: z
-        .enum(['male', 'female', 'other'], {
-          errorMap: () => ({
-            message: "Gender must be 'male', 'female', or 'other'.",
-          }),
-        })
-        .optional(),
+      gender: z.enum([...Gender] as [string, ...string[]]).optional(),
       dateOfBirth: z.string().optional(),
       email: z.string().email('Invalid email').optional(),
       contactNo: z.string().min(1, 'Contact number is required').optional(),
