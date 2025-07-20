@@ -31,7 +31,7 @@ const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
 }
 
 const getSingleFacultyFromDB = async (id: string) => {
-  const result = await Faculty.findOne({ id })
+  const result = await Faculty.findById(id)
     .populate({
       path: 'academicDepartment',
       populate: {
@@ -56,7 +56,7 @@ const updateSingleFacultyIntoDB = async (
     }
   }
 
-  const result = await Faculty.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Faculty.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   })
@@ -68,8 +68,8 @@ const deleteSingleFacultyFromDB = async (id: string) => {
   try {
     session.startTransaction()
 
-    const deletedFaculty = await Faculty.findOneAndUpdate(
-      { id },
+    const deletedFaculty = await Faculty.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     )
@@ -85,8 +85,10 @@ const deleteSingleFacultyFromDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete faculty.')
     }
 
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+    const userId = deletedFaculty.user
+
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session },
     )

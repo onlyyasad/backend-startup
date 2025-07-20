@@ -21,7 +21,7 @@ const getAllAdminFromDB = async (query: Record<string, unknown>) => {
 }
 
 const getSingleAdminFromDB = async (id: string) => {
-  const result = await Admin.findOne({ id })
+  const result = await Admin.findById(id)
   return result
 }
 
@@ -39,7 +39,7 @@ const updateSingleAdminIntoDB = async (
     }
   }
 
-  const result = await Admin.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Admin.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   })
@@ -51,8 +51,8 @@ const deleteSingleAdminFromDB = async (id: string) => {
   try {
     session.startTransaction()
 
-    const deletedAdmin = await Admin.findOneAndUpdate(
-      { id },
+    const deletedAdmin = await Admin.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     )
@@ -61,8 +61,10 @@ const deleteSingleAdminFromDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete admin.')
     }
 
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+    const userId = deletedAdmin.user
+
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session },
     )
