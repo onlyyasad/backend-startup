@@ -1,7 +1,7 @@
 import { Types } from 'mongoose'
 
 export type TPreRequisiteCourses = {
-  courses: Types.ObjectId
+  course: Types.ObjectId
   isDeleted: boolean
 }
 
