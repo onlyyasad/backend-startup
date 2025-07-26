@@ -37,14 +37,14 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
   const session = await mongoose.startSession()
 
   try {
-    session.startTransaction()
+    await session.startTransaction()
 
     //step1: basic course info update
 
     const updatedBasicCourseInfo = await Course.findByIdAndUpdate(
       id,
       courseRemainingData,
-      { new: true, runValidators: true },
+      { new: true, runValidators: true, session },
     )
 
     if (!updatedBasicCourseInfo) {
@@ -59,11 +59,15 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
         .filter((el) => el.course && el.isDeleted)
         .map((el) => el.course)
 
-      const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
-        $pull: {
-          preRequisiteCourses: { course: { $in: deletedPreRequisites } },
+      const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(
+        id,
+        {
+          $pull: {
+            preRequisiteCourses: { course: { $in: deletedPreRequisites } },
+          },
         },
-      })
+        { new: true, runValidators: true, session },
+      )
 
       if (!deletedPreRequisiteCourses) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!')
@@ -74,17 +78,21 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
         (el) => el.course && !el.isDeleted,
       )
 
-      const newPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
-        $addToSet: { preRequisiteCourses: { $each: newPreRequisites } },
-      })
+      const newPreRequisiteCourses = await Course.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: { preRequisiteCourses: { $each: newPreRequisites } },
+        },
+        { new: true, runValidators: true, session },
+      )
 
       if (!newPreRequisiteCourses) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!')
       }
     }
 
-    session.commitTransaction()
-    session.endSession()
+    await session.commitTransaction()
+    await session.endSession()
 
     const result = await Course.findById(id).populate(
       'preRequisiteCourses.course',
@@ -92,8 +100,8 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
 
     return result
   } catch (_err) {
-    session.abortTransaction()
-    session.endSession()
+    await session.abortTransaction()
+    await session.endSession()
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course')
   }
 }
