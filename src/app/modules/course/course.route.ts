@@ -23,8 +23,14 @@ router.patch(
 
 router.put(
   '/:courseId/assign-faculties',
-  validateRequest(CourseValidation.assignFacultiesWithCourseValidationSchema),
+  validateRequest(CourseValidation.facultiesWithCourseValidationSchema),
   CourseControllers.assignFacultiesWithCourse,
+)
+
+router.delete(
+  '/:courseId/remove-faculties',
+  validateRequest(CourseValidation.facultiesWithCourseValidationSchema),
+  CourseControllers.removeFacultiesFromCourse,
 )
 
 router.delete('/:id', CourseControllers.deleteSingleCourse)
