@@ -1,6 +1,8 @@
 import { Types } from 'mongoose'
+import { SemesterRegistrationStatus } from './semesterRegistration.constant'
 
-export type TSemesterRegistrationStatus = 'UPCOMING' | 'ONGOING' | 'ENDED'
+export type TSemesterRegistrationStatus =
+  (typeof SemesterRegistrationStatus)[number]
 
 export type TSemesterRegistration = {
   academicSemester: Types.ObjectId
@@ -9,4 +11,6 @@ export type TSemesterRegistration = {
   endDate: Date
   minCredit: number
   maxCredit: number
+  createdAt?: Date
+  updatedAt?: Date
 }
