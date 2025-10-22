@@ -1,20 +1,58 @@
+import AppError from '../../errors/appError'
+import { AcademicSemester } from '../academicSemester/academicSemester.model'
+import { SemesterRegistrationStatus } from './semesterRegistration.constant'
 import { TSemesterRegistration } from './semesterRegistration.interface'
-import { SemesterRegistrationModel } from './semesterRegistration.model'
+import { SemesterRegistration } from './semesterRegistration.model'
+import { status as httpStatus } from 'http-status'
 
 const getAllSemesterRegistrationsFromDB = async () => {
-  const result = await SemesterRegistrationModel.find()
+  const result = await SemesterRegistration.find()
   return result
 }
 
 const getSingleSemesterRegistrationsFromDB = async (id: string) => {
-  const result = await SemesterRegistrationModel.findById(id)
+  const result = await SemesterRegistration.findById(id)
   return result
 }
 
 const createSemesterRegistrationIntoDB = async (
   payload: TSemesterRegistration,
 ) => {
-  const result = await SemesterRegistrationModel.create(payload)
+  const academicSemesterId = payload.academicSemester
+  const isAcademicSemesterExists =
+    await AcademicSemester.findById(academicSemesterId)
+
+  if (!isAcademicSemesterExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Semester not found')
+  }
+
+  const isAlreadyUpcomingOrOngoingRegisteredSemesterExists =
+    await SemesterRegistration.findOne({
+      $or: [
+        { status: SemesterRegistrationStatus[0] },
+        { status: SemesterRegistrationStatus[1] },
+      ],
+    })
+
+  if (isAlreadyUpcomingOrOngoingRegisteredSemesterExists) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `An ${isAlreadyUpcomingOrOngoingRegisteredSemesterExists.status} semester registration already exists!`,
+    )
+  }
+
+  const isSemesterRegistrationExists = await SemesterRegistration.findOne({
+    academicSemester: academicSemesterId,
+  })
+
+  if (isSemesterRegistrationExists) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'Semester Registration already exists for this academic semester',
+    )
+  }
+
+  const result = await SemesterRegistration.create(payload)
   return result
 }
 
@@ -22,7 +60,7 @@ const updateSemesterRegistrationIntoDB = async (
   id: string,
   payload: TSemesterRegistration,
 ) => {
-  const result = await SemesterRegistrationModel.findByIdAndUpdate(id, payload)
+  const result = await SemesterRegistration.findByIdAndUpdate(id, payload)
   return result
 }
 
