@@ -1,13 +1,6 @@
 import { TSemesterRegistration } from './semesterRegistration.interface'
 import { SemesterRegistrationModel } from './semesterRegistration.model'
 
-const createSemesterRegistrationIntoDB = async (
-  payload: TSemesterRegistration,
-) => {
-  const result = await SemesterRegistrationModel.create(payload)
-  return result
-}
-
 const getAllSemesterRegistrationsFromDB = async () => {
   const result = await SemesterRegistrationModel.find()
   return result
@@ -18,8 +11,24 @@ const getSingleSemesterRegistrationsFromDB = async (id: string) => {
   return result
 }
 
+const createSemesterRegistrationIntoDB = async (
+  payload: TSemesterRegistration,
+) => {
+  const result = await SemesterRegistrationModel.create(payload)
+  return result
+}
+
+const updateSemesterRegistrationIntoDB = async (
+  id: string,
+  payload: TSemesterRegistration,
+) => {
+  const result = await SemesterRegistrationModel.findByIdAndUpdate(id, payload)
+  return result
+}
+
 export const SemesterRegistrationService = {
-  createSemesterRegistrationIntoDB,
   getAllSemesterRegistrationsFromDB,
   getSingleSemesterRegistrationsFromDB,
+  createSemesterRegistrationIntoDB,
+  updateSemesterRegistrationIntoDB,
 }
