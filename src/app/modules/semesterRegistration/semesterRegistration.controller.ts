@@ -5,7 +5,9 @@ import { status as httpStatus } from 'http-status'
 
 const getAllSemesterRegistrations = catchAsync(async (req, res) => {
   const result =
-    await SemesterRegistrationService.getAllSemesterRegistrationsFromDB()
+    await SemesterRegistrationService.getAllSemesterRegistrationsFromDB(
+      req.query,
+    )
 
   sendResponse(res, {
     success: true,
