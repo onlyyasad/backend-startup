@@ -70,7 +70,39 @@ const updateSemesterRegistrationIntoDB = async (
   id: string,
   payload: TSemesterRegistration,
 ) => {
-  const result = await SemesterRegistration.findByIdAndUpdate(id, payload)
+  const isSemesterRegistrationExists = await SemesterRegistration.findById(id)
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Semester Registration not found')
+  }
+
+  const isEnded = isSemesterRegistrationExists.status === 'ENDED'
+  if (isEnded) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot update an ENDED semester registration',
+    )
+  }
+
+  const currentStatus = isSemesterRegistrationExists.status
+  const newStatus = payload?.status
+
+  if (currentStatus === 'UPCOMING' && newStatus === 'ENDED') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot change status directly from UPCOMING to ENDED',
+    )
+  }
+
+  if (currentStatus === 'ONGOING' && newStatus === 'UPCOMING') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot change status from ONGOING to UPCOMING',
+    )
+  }
+
+  const result = await SemesterRegistration.findByIdAndUpdate(id, payload, {
+    new: true,
+  })
   return result
 }
 
