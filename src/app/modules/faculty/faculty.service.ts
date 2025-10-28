@@ -39,6 +39,10 @@ const getSingleFacultyFromDB = async (id: string) => {
       },
     })
     .populate('academicFaculty')
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found')
+  }
   return result
 }
 
