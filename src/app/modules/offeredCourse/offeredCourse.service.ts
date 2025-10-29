@@ -44,6 +44,26 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     throw new Error('Faculty not found')
   }
 
+  const isDepartmentBelongToFaculty = await AcademicDepartment.findOne({
+    _id: academicDepartment,
+    academicFaculty,
+  })
+  if (!isDepartmentBelongToFaculty) {
+    throw new Error(
+      'Academic Department does not belong to the specified Academic Faculty',
+    )
+  }
+
+  const isSameRegistrationExistsInTheSection = await OfferedCourse.findOne({
+    semesterRegistration,
+    course,
+    section: rest.section,
+  })
+  if (isSameRegistrationExistsInTheSection) {
+    throw new Error(
+      'Offered Course with the same Semester Registration, Course, and Section already exists',
+    )
+  }
   const academicSemesterId = isSemesterRegistrationExist.academicSemester
 
   const finalPayload = {
