@@ -107,8 +107,56 @@ const getSingleOfferedCourseFromDB = async (id: string) => {}
 
 const updateOfferedCourseIntoDB = async (
   id: string,
-  payload: Partial<TOfferedCourse>,
-) => {}
+  payload: Pick<TOfferedCourse, 'faculty' | 'days' | 'startTime' | 'endTime'>,
+) => {
+  const { faculty, days, startTime, endTime } = payload
+  const offeredCourse = await OfferedCourse.findById(id)
+
+  if (!offeredCourse) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Offered Course not found')
+  }
+
+  const isFacultyExists = await Faculty.findById(payload.faculty)
+  if (!isFacultyExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found')
+  }
+
+  const assignedSchedules = await OfferedCourse.find({
+    semesterRegistration: offeredCourse.semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime')
+
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  }
+
+  const checkTimeConflict = hasTimeConflict(assignedSchedules, newSchedule)
+  if (checkTimeConflict) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `Schedule conflict detected with existing schedule: Days ${newSchedule.days}, Time ${newSchedule.startTime} - ${newSchedule.endTime}`,
+    )
+  }
+
+  const semesterRegistration = await SemesterRegistration.findById(
+    offeredCourse.semesterRegistration,
+  )
+
+  if (semesterRegistration?.status !== 'UPCOMING') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Offered Course cannot be updated as the associated Semester Registration is either ONGOING or ENDED',
+    )
+  }
+
+  const result = await OfferedCourse.findByIdAndUpdate(id, payload, {
+    new: true,
+  })
+  return result
+}
 
 export const OfferedCourseService = {
   createOfferedCourseIntoDB,

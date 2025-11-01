@@ -41,32 +41,27 @@ const createOfferedCourseValidationSchema = z.object({
 
 const updateOfferedCourseValidationSchema = z.object({
   body: z.object({
-    faculty: z.string().optional(),
-    maxCapacity: z.number().optional(),
-    days: z.array(z.enum(Days as [string, ...string[]])).optional(),
-    startTime: z
-      .string()
-      .refine(
-        (val) => {
-          const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
-          return timeRegex.test(val)
-        },
-        { message: 'Invalid time format. Expected HH:MM in 24-hour format' },
-      )
-      .optional(),
-    endTime: z
-      .string()
-      .refine(
-        (val) => {
-          const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
-          return timeRegex.test(val)
-        },
-        { message: 'Invalid time format. Expected HH:MM in 24-hour format' },
-      )
-      .optional(),
+    faculty: z.string(),
+    maxCapacity: z.number(),
+    days: z.array(z.enum(Days as [string, ...string[]])),
+    startTime: z.string().refine(
+      (val) => {
+        const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+        return timeRegex.test(val)
+      },
+      { message: 'Invalid time format. Expected HH:MM in 24-hour format' },
+    ),
+    endTime: z.string().refine(
+      (val) => {
+        const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+        return timeRegex.test(val)
+      },
+      { message: 'Invalid time format. Expected HH:MM in 24-hour format' },
+    ),
   }),
 })
 
 export const OfferedCourseValidation = {
   createOfferedCourseValidationSchema,
+  updateOfferedCourseValidationSchema,
 }
