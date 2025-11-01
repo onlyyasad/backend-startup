@@ -7,6 +7,7 @@ import { SemesterRegistration } from '../semesterRegistration/semesterRegistrati
 import { TOfferedCourse } from './offeredCourse.interface'
 import { OfferedCourse } from './offeredCourse.model'
 import { status as httpStatus } from 'http-status'
+import { hasTimeConflict } from './offeredCourse.utils'
 
 const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
   const {
@@ -81,33 +82,19 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     endTime: rest.endTime,
   }
 
-  for (const assigned of assignedSchedules) {
-    const existingStartTime = new Date(`1970-01-01T${assigned.startTime}:00Z`)
-    const existingEndTime = new Date(`1970-01-01T${assigned.endTime}:00Z`)
-    const newStartTime = new Date(`1970-01-01T${newSchedule.startTime}:00Z`)
-    const newEndTime = new Date(`1970-01-01T${newSchedule.endTime}:00Z`)
-
-    const isOverlap =
-      newStartTime < existingEndTime && newEndTime > existingStartTime
-
-    if (isOverlap) {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        `Schedule conflict detected with existing schedule: Days ${assigned.days}, Time ${assigned.startTime} - ${assigned.endTime}`,
-      )
-    }
+  const checkTimeConflict = hasTimeConflict(assignedSchedules, newSchedule)
+  if (checkTimeConflict) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `Schedule conflict detected with existing schedule: Days ${newSchedule.days}, Time ${newSchedule.startTime} - ${newSchedule.endTime}`,
+    )
   }
 
   const academicSemesterId = isSemesterRegistrationExist.academicSemester
 
   const finalPayload = {
-    semesterRegistration,
+    ...payload,
     academicSemester: academicSemesterId,
-    academicFaculty,
-    academicDepartment,
-    course,
-    faculty,
-    ...rest,
   }
 
   const result = await OfferedCourse.create(finalPayload)
