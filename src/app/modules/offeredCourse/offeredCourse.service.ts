@@ -101,9 +101,28 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
   return result
 }
 
-const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {}
+const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
+  const result = await OfferedCourse.find(query)
+    .populate('academicSemester')
+    .populate('academicFaculty')
+    .populate('academicDepartment')
+    .populate('course')
+    .populate('faculty')
+  return result
+}
 
-const getSingleOfferedCourseFromDB = async (id: string) => {}
+const getSingleOfferedCourseFromDB = async (id: string) => {
+  const result = await OfferedCourse.findById(id)
+    .populate('academicSemester')
+    .populate('academicFaculty')
+    .populate('academicDepartment')
+    .populate('course')
+    .populate('faculty')
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Offered Course not found')
+  }
+  return result
+}
 
 const updateOfferedCourseIntoDB = async (
   id: string,
@@ -158,9 +177,15 @@ const updateOfferedCourseIntoDB = async (
   return result
 }
 
+const deleteOfferedCourseFromDB = async (id: string) => {
+  const result = await OfferedCourse.findByIdAndDelete(id)
+  return result
+}
+
 export const OfferedCourseService = {
   createOfferedCourseIntoDB,
   getAllOfferedCoursesFromDB,
   getSingleOfferedCourseFromDB,
   updateOfferedCourseIntoDB,
+  deleteOfferedCourseFromDB,
 }

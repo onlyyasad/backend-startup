@@ -14,8 +14,29 @@ const createOfferedCourse = catchAsync(async (req, res) => {
   })
 })
 
-const getAllOfferedCourses = catchAsync(async (req, res) => {})
-const getSingleOfferedCourse = catchAsync(async (req, res) => {})
+const getAllOfferedCourses = catchAsync(async (req, res) => {
+  const result = await OfferedCourseService.getAllOfferedCoursesFromDB(
+    req.query,
+  )
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Offered Courses are retrieved successfully!',
+    data: result,
+  })
+})
+const getSingleOfferedCourse = catchAsync(async (req, res) => {
+  const { id } = req.params
+  const result = await OfferedCourseService.getSingleOfferedCourseFromDB(id)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Offered Course is retrieved successfully!',
+    data: result,
+  })
+})
 const updateOfferedCourse = catchAsync(async (req, res) => {
   const { id } = req.params
   const result = await OfferedCourseService.updateOfferedCourseIntoDB(
@@ -31,9 +52,22 @@ const updateOfferedCourse = catchAsync(async (req, res) => {
   })
 })
 
+const deleteOfferedCourse = catchAsync(async (req, res) => {
+  const { id } = req.params
+  const result = await OfferedCourseService.deleteOfferedCourseFromDB(id)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Offered Course is deleted successfully!',
+    data: result,
+  })
+})
+
 export const OfferedCourseController = {
   createOfferedCourse,
   getAllOfferedCourses,
   getSingleOfferedCourse,
   updateOfferedCourse,
+  deleteOfferedCourse,
 }
