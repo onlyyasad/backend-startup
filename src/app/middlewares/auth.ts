@@ -5,7 +5,7 @@ import { status as httpStatus } from 'http-status'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import config from '../config'
 
-const auth = () => {
+const auth = (...requiredRoles: string[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization
 
@@ -26,6 +26,15 @@ const auth = () => {
             'You are not authorized to access this resource.',
           )
         }
+
+        const userRole = (decoded as JwtPayload)?.role
+        if (requiredRoles && !requiredRoles.includes(userRole as string)) {
+          throw new AppError(
+            httpStatus.UNAUTHORIZED,
+            'You are not authorized to access this resource.',
+          )
+        }
+
         req.user = decoded as JwtPayload
         next()
       },
