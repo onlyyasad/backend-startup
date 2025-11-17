@@ -37,7 +37,6 @@ const loginUserInDB = async (payload: TLoginUser) => {
     expiresIn: '10d',
   })
 
-  console.log(user)
   return {
     accessToken,
     needsPasswordChange: user?.needsPasswordChange,
