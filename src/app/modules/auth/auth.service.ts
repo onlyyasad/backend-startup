@@ -2,32 +2,31 @@ import AppError from '../../errors/appError'
 import { User } from '../user/user.model'
 import { TLoginUser } from './auth.interface'
 import { status as httpStatus } from 'http-status'
-import bcrypt from 'bcrypt'
 
 const loginUserInDB = async (payload: TLoginUser) => {
-  const isUserExists = await User.findOne({ id: payload?.id })
-  if (!isUserExists) {
+  const user = await User.isUserExistsByCustomId(payload.id)
+  if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found.')
   }
 
-  if (isUserExists.isDeleted) {
+  if (user.isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'User is deleted.')
   }
 
-  if (isUserExists.status === 'blocked') {
+  if (user.status === 'blocked') {
     throw new AppError(httpStatus.FORBIDDEN, 'User is blocked.')
   }
 
-  const isPasswordMatched = await bcrypt.compare(
+  const isPasswordMatched = await User.isPasswordMatched(
     payload?.password,
-    isUserExists.password,
+    user?.password,
   )
 
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Password is incorrect.')
   }
 
-  console.log(isUserExists)
+  console.log(user)
 }
 
 export const AuthService = {
