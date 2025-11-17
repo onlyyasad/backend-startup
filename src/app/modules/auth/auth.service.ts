@@ -1,7 +1,9 @@
+import config from '../../config'
 import AppError from '../../errors/appError'
 import { User } from '../user/user.model'
 import { TLoginUser } from './auth.interface'
 import { status as httpStatus } from 'http-status'
+import jwt from 'jsonwebtoken'
 
 const loginUserInDB = async (payload: TLoginUser) => {
   const user = await User.isUserExistsByCustomId(payload.id)
@@ -26,7 +28,20 @@ const loginUserInDB = async (payload: TLoginUser) => {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Password is incorrect.')
   }
 
+  const jwtPayload = {
+    id: user.id,
+    role: user.role,
+  }
+
+  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    expiresIn: '10d',
+  })
+
   console.log(user)
+  return {
+    accessToken,
+    needsPasswordChange: user?.needsPasswordChange,
+  }
 }
 
 export const AuthService = {
