@@ -3,8 +3,9 @@ import AppError from '../../errors/appError'
 import { User } from '../user/user.model'
 import { TLoginUser } from './auth.interface'
 import { status as httpStatus } from 'http-status'
-import jwt, { JwtPayload } from 'jsonwebtoken'
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import { createToken } from './auth.utils'
 
 const loginUserInDB = async (payload: TLoginUser) => {
   const user = await User.isUserExistsByCustomId(payload.id)
@@ -34,12 +35,21 @@ const loginUserInDB = async (payload: TLoginUser) => {
     role: user.role,
   }
 
-  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    expiresIn: '10d',
-  })
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as SignOptions['expiresIn'],
+  )
+
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as SignOptions['expiresIn'],
+  )
 
   return {
     accessToken,
+    refreshToken,
     needsPasswordChange: user?.needsPasswordChange,
   }
 }
