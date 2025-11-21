@@ -70,4 +70,17 @@ userSchema.statics.isPasswordMatched = async function (
   return isPasswordMatched
 }
 
+userSchema.statics.isJWTIssuedBeforePasswordChange = function (
+  jwtIssuedAt: number,
+  passwordChangedAt?: Date,
+) {
+  if (passwordChangedAt) {
+    const passwordChangedAtInSeconds = Math.floor(
+      new Date(passwordChangedAt).getTime() / 1000,
+    )
+    return jwtIssuedAt < passwordChangedAtInSeconds
+  }
+  return false
+}
+
 export const User = model<TUser, UserModel>('User', userSchema)
