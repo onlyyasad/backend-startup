@@ -80,6 +80,7 @@ const changePasswordInDB = async (
     {
       password: newHashedPassword,
       needsPasswordChange: false,
+      passwordChangedAt: new Date(),
     },
   )
 
