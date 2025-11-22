@@ -24,6 +24,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
   //set student role
   userData.role = 'student'
+  userData.email = payload.email
 
   //set manually generated id
 
@@ -75,6 +76,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
   //set faculty role
   userData.role = 'faculty'
+  userData.email = payload.email
 
   const session = await mongoose.startSession()
   try {
@@ -120,6 +122,7 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
 
   //set admin role
   userData.role = 'admin'
+  userData.email = payload.email
 
   const session = await mongoose.startSession()
   try {
