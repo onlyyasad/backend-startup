@@ -3,18 +3,10 @@ import { UserServices } from './user.service'
 import sendResponse from '../../utils/sendResponse'
 import { status as httpStatus } from 'http-status'
 import catchAsync from '../../utils/catchAsync'
-import AppError from '../../errors/appError'
 
 const getMe: RequestHandler = catchAsync(async (req, res) => {
-  // const { password, admin: adminData } = req.body
-  const token = req.headers.authorization
-  if (!token) {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      'You are not authorized to access this resource.',
-    )
-  }
-  const result = await UserServices.getMeFromDB(token)
+  const { id, role } = req.user
+  const result = await UserServices.getMeFromDB(id, role)
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -62,9 +54,23 @@ const createAdmin: RequestHandler = catchAsync(async (req, res) => {
   })
 })
 
+const changeStatus: RequestHandler = catchAsync(async (req, res) => {
+  const { id } = req.params
+  const payload = req.body
+  const result = await UserServices.changeStatusInDB(id, payload)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User status changed successfully!',
+    data: result,
+  })
+})
+
 export const UserControllers = {
   getMe,
   createStudent,
   createFaculty,
   createAdmin,
+  changeStatus,
 }
