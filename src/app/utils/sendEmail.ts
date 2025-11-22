@@ -8,17 +8,17 @@ export const sendEmail = async (
   resetLink: string,
 ) => {
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
+    host: config.email_host,
+    port: Number(config.email_port),
     secure: config.NODE_ENV === 'production', // true for 465, false for other ports
     auth: {
-      user: 'hafij.alasad23@gmail.com',
-      pass: 'ntrx oecc smft bonx',
+      user: config.email_user,
+      pass: config.email_pass,
     },
   })
 
   await transporter.sendMail({
-    from: 'hafij.alasad23@gmail.com',
+    from: config.email_user, // sender address
     to,
     subject: subject,
     text: 'Reset your password within 10 minutes.', // plain‑text body

@@ -179,12 +179,13 @@ const forgetPasswordInDB = async (id: string) => {
   )
 
   const resetUiLink = `${config.reset_pass_ui_link}/reset-password?id=${user.id}&token=${resetToken}`
+  const emailBody = `<b>Click the link below to reset your password within 10 minutes:</b> \n ${resetUiLink}`
 
   await sendEmail(
     user.email,
     'Password Reset Request',
     `Click the link below to reset your password`,
-    resetUiLink,
+    emailBody,
   )
 }
 
