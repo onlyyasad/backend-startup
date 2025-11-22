@@ -5,7 +5,7 @@ export const sendEmail = async (
   to: string,
   subject: string,
   text: string,
-  resetLink: string,
+  emailBody: string,
 ) => {
   const transporter = nodemailer.createTransport({
     host: config.email_host,
@@ -21,7 +21,7 @@ export const sendEmail = async (
     from: config.email_user, // sender address
     to,
     subject: subject,
-    text: 'Reset your password within 10 minutes.', // plain‑text body
-    html: `<b>${text}${resetLink}</b>`, // HTML body
+    text, // plain‑text body
+    html: emailBody, // HTML body
   })
 }

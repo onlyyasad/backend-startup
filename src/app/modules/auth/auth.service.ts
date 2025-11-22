@@ -189,9 +189,53 @@ const forgetPasswordInDB = async (id: string) => {
   )
 }
 
+const resetPasswordInDB = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  const user = await User.isUserExistsByCustomId(payload.id)
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found.')
+  }
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted.')
+  }
+
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked.')
+  }
+
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload
+
+  if (decoded.id !== payload.id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid or expired token.')
+  }
+
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  )
+
+  await User.findOneAndUpdate(
+    { id: payload.id, role: user.role },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    },
+  )
+
+  return null
+}
+
 export const AuthService = {
   loginUserInDB,
   changePasswordInDB,
   refreshTokenInDB,
   forgetPasswordInDB,
+  resetPasswordInDB,
 }
