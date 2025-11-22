@@ -1,4 +1,4 @@
-import jwt, { SignOptions } from 'jsonwebtoken'
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken'
 
 export const createToken = (
   jwtPayload: { id: string; role: string },
@@ -10,4 +10,8 @@ export const createToken = (
   })
 
   return token
+}
+
+export const verifyToken = (token: string, secret: string) => {
+  return jwt.verify(token, secret) as JwtPayload
 }

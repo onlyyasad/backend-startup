@@ -15,6 +15,25 @@ import { status as httpStatus } from 'http-status'
 import { TFaculty } from '../faculty/faculty.interface'
 import { Faculty } from '../faculty/faculty.model'
 import { Admin } from '../admin/admin.model'
+import { verifyToken } from '../auth/auth.utils'
+import { USER_ROLE } from './user.constant'
+
+const getMeFromDB = async (token: string) => {
+  const decoded = verifyToken(token, config.jwt_access_secret as string)
+  const { id, role } = decoded
+
+  let result = null
+  if (role === USER_ROLE.student) {
+    result = await Student.findOne({ id })
+  }
+  if (role === USER_ROLE.faculty) {
+    result = await Faculty.findOne({ id })
+  }
+  if (role === USER_ROLE.admin) {
+    result = await Admin.findOne({ id })
+  }
+  return result
+}
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   //create a user object
@@ -161,6 +180,7 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
 }
 
 export const UserServices = {
+  getMeFromDB,
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,

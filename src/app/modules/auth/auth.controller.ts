@@ -5,6 +5,7 @@ import { TLoginUser } from './auth.interface'
 import { status as httpStatus } from 'http-status'
 import { AuthService } from './auth.service'
 import config from '../../config'
+import AppError from '../../errors/appError'
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const loginData: TLoginUser = req.body
@@ -69,7 +70,13 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization
-  const result = await AuthService.resetPasswordInDB(req.body, token as string)
+  if (!token) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to access this resource.',
+    )
+  }
+  const result = await AuthService.resetPasswordInDB(req.body, token)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

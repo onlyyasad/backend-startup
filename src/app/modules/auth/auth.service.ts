@@ -5,7 +5,7 @@ import { TLoginUser } from './auth.interface'
 import { status as httpStatus } from 'http-status'
 import { JwtPayload, SignOptions } from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { createToken } from './auth.utils'
+import { createToken, verifyToken } from './auth.utils'
 import jwt from 'jsonwebtoken'
 import { sendEmail } from '../../utils/sendEmail'
 
@@ -206,10 +206,7 @@ const resetPasswordInDB = async (
     throw new AppError(httpStatus.FORBIDDEN, 'User is blocked.')
   }
 
-  const decoded = jwt.verify(
-    token,
-    config.jwt_access_secret as string,
-  ) as JwtPayload
+  const decoded = verifyToken(token, config.jwt_access_secret as string)
 
   if (decoded.id !== payload.id) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid or expired token.')
