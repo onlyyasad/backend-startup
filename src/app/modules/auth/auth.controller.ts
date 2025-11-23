@@ -5,6 +5,7 @@ import { TLoginUser } from './auth.interface'
 import { status as httpStatus } from 'http-status'
 import { AuthService } from './auth.service'
 import config from '../../config'
+import AppError from '../../errors/appError'
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const loginData: TLoginUser = req.body
@@ -54,8 +55,41 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const forgetPassword = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.body.id
+  const result = await AuthService.forgetPasswordInDB(userId)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message:
+      'If a user with that email exists, a password reset link has been sent.',
+    data: result,
+  })
+})
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization
+  if (!token) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to access this resource.',
+    )
+  }
+  const result = await AuthService.resetPasswordInDB(req.body, token)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password has been reset successfully',
+    data: result,
+  })
+})
+
 export const AuthControllers = {
   loginUser,
   changePassword,
   refreshToken,
+  forgetPassword,
+  resetPassword,
 }

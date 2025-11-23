@@ -3,12 +3,24 @@ import { USER_ROLE } from './user.constant'
 
 export interface TUser {
   id: string
+  email: string
   password: string
   needsPasswordChange: boolean
   passwordChangedAt?: Date
   role: 'admin' | 'student' | 'faculty'
   status: 'in-progress' | 'blocked'
   isDeleted: boolean
+}
+
+export interface IFile extends File {
+  fieldname: string
+  originalname: string
+  encoding: string
+  mimetype: string
+  destination: string
+  filename: string
+  path: string
+  size: number
 }
 
 export interface UserModel extends Model<TUser> {

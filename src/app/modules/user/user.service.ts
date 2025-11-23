@@ -3,7 +3,7 @@ import config from '../../config'
 import { AcademicSemester } from '../academicSemester/academicSemester.model'
 import { TStudent } from '../student/student.interface'
 import { Student } from '../student/student.model'
-import { TUser } from './user.interface'
+import { IFile, TUser } from './user.interface'
 import { User } from './user.model'
 import {
   generateAdminId,
@@ -15,8 +15,28 @@ import { status as httpStatus } from 'http-status'
 import { TFaculty } from '../faculty/faculty.interface'
 import { Faculty } from '../faculty/faculty.model'
 import { Admin } from '../admin/admin.model'
+import { USER_ROLE } from './user.constant'
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary'
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const getMeFromDB = async (id: string, role: string) => {
+  let result = null
+  if (role === USER_ROLE.student) {
+    result = await Student.findOne({ id }).populate('user')
+  }
+  if (role === USER_ROLE.faculty) {
+    result = await Faculty.findOne({ id }).populate('user')
+  }
+  if (role === USER_ROLE.admin) {
+    result = await Admin.findOne({ id }).populate('user')
+  }
+  return result
+}
+
+const createStudentIntoDB = async (
+  file: IFile,
+  password: string,
+  payload: TStudent,
+) => {
   //create a user object
   const userData: Partial<TUser> = {}
 
@@ -24,6 +44,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
   //set student role
   userData.role = 'student'
+  userData.email = payload.email
 
   //set manually generated id
 
@@ -36,6 +57,14 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     session.startTransaction()
     userData.id = await generateStudentId(admissionSemester)
 
+    const imageName = `${userData.id}-${payload?.name?.firstName}-${Date.now()}`
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const imageData: any = await sendImageToCloudinary(
+      imageName,
+      file?.path as string,
+    )
+
     //create a user (---- Transaction 1 -----)
     const newUser = await User.create([userData], { session })
 
@@ -47,13 +76,17 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     //set id, _id as user
     payload.id = newUser[0].id //embedding id
     payload.user = newUser[0]._id //reference id
+    payload.profileImg = imageData?.secure_url
 
     //create a student (---- Transaction 2 -----)
 
     const newStudent = await Student.create([payload], { session })
 
     if (!newStudent.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student.')
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Failed to create student2222.',
+      )
     }
 
     await session.commitTransaction()
@@ -75,6 +108,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
   //set faculty role
   userData.role = 'faculty'
+  userData.email = payload.email
 
   const session = await mongoose.startSession()
   try {
@@ -120,6 +154,7 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
 
   //set admin role
   userData.role = 'admin'
+  userData.email = payload.email
 
   const session = await mongoose.startSession()
   try {
@@ -157,8 +192,19 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   }
 }
 
+const changeStatusInDB = async (id: string, payload: { status: string }) => {
+  const result = await User.findByIdAndUpdate(
+    id,
+    { status: payload.status },
+    { new: true },
+  )
+  return result
+}
+
 export const UserServices = {
+  getMeFromDB,
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  changeStatusInDB,
 }

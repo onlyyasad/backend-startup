@@ -5,8 +5,9 @@ import { TLoginUser } from './auth.interface'
 import { status as httpStatus } from 'http-status'
 import { JwtPayload, SignOptions } from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { createToken } from './auth.utils'
+import { createToken, verifyToken } from './auth.utils'
 import jwt from 'jsonwebtoken'
+import { sendEmail } from '../../utils/sendEmail'
 
 const loginUserInDB = async (payload: TLoginUser) => {
   const user = await User.isUserExistsByCustomId(payload.id)
@@ -152,8 +153,86 @@ const refreshTokenInDB = async (token: string) => {
   }
 }
 
+const forgetPasswordInDB = async (id: string) => {
+  const user = await User.isUserExistsByCustomId(id)
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found.')
+  }
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted.')
+  }
+
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked.')
+  }
+
+  const jwtPayload = {
+    id: user.id,
+    role: user.role,
+  }
+
+  const resetToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    '10m',
+  )
+
+  const resetUiLink = `${config.reset_pass_ui_link}/reset-password?id=${user.id}&token=${resetToken}`
+  const emailBody = `<b>Click the link below to reset your password within 10 minutes:</b> \n ${resetUiLink}`
+
+  await sendEmail(
+    user.email,
+    'Password Reset Request',
+    `Click the link below to reset your password`,
+    emailBody,
+  )
+}
+
+const resetPasswordInDB = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  const user = await User.isUserExistsByCustomId(payload.id)
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found.')
+  }
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted.')
+  }
+
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked.')
+  }
+
+  const decoded = verifyToken(token, config.jwt_access_secret as string)
+
+  if (decoded.id !== payload.id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid or expired token.')
+  }
+
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  )
+
+  await User.findOneAndUpdate(
+    { id: payload.id, role: user.role },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    },
+  )
+
+  return null
+}
+
 export const AuthService = {
   loginUserInDB,
   changePasswordInDB,
   refreshTokenInDB,
+  forgetPasswordInDB,
+  resetPasswordInDB,
 }
