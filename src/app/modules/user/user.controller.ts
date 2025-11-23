@@ -3,6 +3,7 @@ import { UserServices } from './user.service'
 import sendResponse from '../../utils/sendResponse'
 import { status as httpStatus } from 'http-status'
 import catchAsync from '../../utils/catchAsync'
+import { IFile } from './user.interface'
 
 const getMe: RequestHandler = catchAsync(async (req, res) => {
   const { id, role } = req.user
@@ -17,8 +18,13 @@ const getMe: RequestHandler = catchAsync(async (req, res) => {
 
 const createStudent: RequestHandler = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body
+  const file = req.file as unknown as IFile
 
-  const result = await UserServices.createStudentIntoDB(password, studentData)
+  const result = await UserServices.createStudentIntoDB(
+    file,
+    password,
+    studentData,
+  )
 
   sendResponse(res, {
     success: true,

@@ -12,6 +12,17 @@ export interface TUser {
   isDeleted: boolean
 }
 
+export interface IFile extends File {
+  fieldname: string
+  originalname: string
+  encoding: string
+  mimetype: string
+  destination: string
+  filename: string
+  path: string
+  size: number
+}
+
 export interface UserModel extends Model<TUser> {
   isUserExistsByCustomId(id: string): Promise<TUser>
   isPasswordMatched(
