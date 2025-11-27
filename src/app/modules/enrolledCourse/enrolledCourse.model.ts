@@ -15,6 +15,11 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>(
       ref: 'SemesterRegistration',
       required: true,
     },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicFaculty',
+      required: true,
+    },
     academicSemester: {
       type: Schema.Types.ObjectId,
       ref: 'AcademicSemester',
@@ -34,7 +39,7 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>(
     student: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
     faculty: { type: Schema.Types.ObjectId, ref: 'Faculty', required: true },
     isEnrolled: { type: Boolean, default: false },
-    courseMarks: { type: courseMarksSchema, default: () => ({}) },
+    courseMarks: { type: courseMarksSchema, default: {} },
     grade: { type: String, enum: GRADE, default: 'N/A' },
     gradePoints: { type: Number, min: 0, max: 4, default: 0 },
     isCompleted: { type: Boolean, default: false },

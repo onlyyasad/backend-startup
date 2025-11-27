@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import AppError from '../../errors/appError'
 import { OfferedCourse } from '../offeredCourse/offeredCourse.model'
 import { Student } from '../student/student.model'
@@ -50,7 +51,50 @@ const createEnrolledCourseIntoDB = async (
     )
   }
 
-  return null
+  const session = await mongoose.startSession()
+
+  try {
+    session.startTransaction()
+
+    const result = await EnrolledCourse.create(
+      [
+        {
+          semesterRegistration: isOfferedCourseExists.semesterRegistration,
+          academicSemester: isOfferedCourseExists.academicSemester,
+          academicFaculty: isOfferedCourseExists.academicFaculty,
+          academicDepartment: isOfferedCourseExists.academicDepartment,
+          offeredCourse: offeredCourse,
+          course: isOfferedCourseExists.course,
+          student: student._id,
+          faculty: isOfferedCourseExists.faculty,
+          isEnrolled: true,
+        },
+      ],
+      { session },
+    )
+
+    if (!result) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Failed to enroll in the course!',
+      )
+    }
+
+    const maxCapacity = isOfferedCourseExists.maxCapacity
+    await OfferedCourse.findByIdAndUpdate(offeredCourse, {
+      maxCapacity: maxCapacity - 1,
+    })
+
+    await session.commitTransaction()
+    session.endSession()
+
+    return result
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    await session.abortTransaction()
+    session.endSession()
+    throw new Error(error)
+  }
 }
 
 export const EnrolledCourseServices = {

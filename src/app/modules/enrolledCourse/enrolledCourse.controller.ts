@@ -10,8 +10,6 @@ const createEnrolledCourse = catchAsync(async (req, res) => {
     req.body,
   )
 
-  console.log('User', req.user)
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
