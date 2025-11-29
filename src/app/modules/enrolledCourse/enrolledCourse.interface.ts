@@ -1,7 +1,7 @@
 import { Types } from 'mongoose'
 import { GRADE } from './enrolledCourse.constant'
 
-export type TCourseMarks = {
+export type TEnrolledCourseMarks = {
   classTest1: number
   midTerm: number
   classTest2: number
@@ -20,7 +20,7 @@ export type TEnrolledCourse = {
   student: Types.ObjectId
   faculty: Types.ObjectId
   isEnrolled: boolean
-  courseMarks: TCourseMarks
+  courseMarks: TEnrolledCourseMarks
   grade: TGrade
   gradePoints: number
   isCompleted: boolean
