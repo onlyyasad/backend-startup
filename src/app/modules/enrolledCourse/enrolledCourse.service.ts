@@ -5,6 +5,8 @@ import { Student } from '../student/student.model'
 import { TEnrolledCourse } from './enrolledCourse.interface'
 import { EnrolledCourse } from './enrolledCourse.model'
 import { status as httpStatus } from 'http-status'
+import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model'
+import { Course } from '../course/course.model'
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -13,8 +15,8 @@ const createEnrolledCourseIntoDB = async (
   /**
    * Step1: check if the offered course exists
    * Step2: check if the student is already enrolled in the course
-   * Step3: create enrolled course entry
-   *
+   * Step3: check if the offered course has reached its maximum capacity
+   * Step4: create enrolled course entry
    */
 
   const { offeredCourse } = payload
@@ -25,7 +27,7 @@ const createEnrolledCourseIntoDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Offered course not found!')
   }
 
-  const student = await Student.findOne({ id: userId }).select('_id')
+  const student = await Student.findOne({ id: userId }, { _id: 1 })
 
   if (!student) {
     throw new AppError(httpStatus.NOT_FOUND, 'Student not found!')
@@ -48,6 +50,67 @@ const createEnrolledCourseIntoDB = async (
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'Offered course has reached its maximum capacity!',
+    )
+  }
+
+  // check total credits exceeds max credit
+
+  const course = await Course.findById(isOfferedCourseExists.course).select(
+    'credits',
+  )
+
+  const currentCredit = course?.credits
+
+  const semesterRegistration = await SemesterRegistration.findById(
+    isOfferedCourseExists.semesterRegistration,
+  ).select('maxCredit')
+
+  const maxCredit = semesterRegistration?.maxCredit
+
+  const enrolledCourses = await EnrolledCourse.aggregate([
+    {
+      $match: {
+        semesterRegistration: isOfferedCourseExists.semesterRegistration,
+        student: student._id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'course',
+        foreignField: '_id',
+        as: 'enrolledCourseData',
+      },
+    },
+    {
+      $unwind: '$enrolledCourseData',
+    },
+    {
+      $group: {
+        _id: null,
+        totalEnrolledCredits: { $sum: '$enrolledCourseData.credits' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalEnrolledCredits: 1,
+      },
+    },
+  ])
+
+  const totalEnrolledCredits =
+    enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0
+
+  if (
+    totalEnrolledCredits &&
+    currentCredit &&
+    maxCredit &&
+    totalEnrolledCredits + currentCredit > maxCredit
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Enrolling in this course exceeds the maximum credit limit for the semester!',
     )
   }
 
