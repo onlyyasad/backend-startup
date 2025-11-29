@@ -1,0 +1,24 @@
+export const calculateGradeAndPoints = (
+  totalMarks: number,
+): { grade: string; gradePoints: number } => {
+  /**
+   * 0-19: F (0.0)
+   * 20-39: D (2.0)
+   * 40-59: C (3.0)
+   * 60-79: B (3.5)
+   * 80-100: A (4.0)
+   * */
+  let result = { grade: 'N/A', gradePoints: 0 }
+  if (totalMarks >= 80 && totalMarks <= 100) {
+    result = { grade: 'A', gradePoints: 4.0 }
+  } else if (totalMarks >= 60 && totalMarks <= 79) {
+    result = { grade: 'B', gradePoints: 3.5 }
+  } else if (totalMarks >= 40 && totalMarks <= 59) {
+    result = { grade: 'C', gradePoints: 3.0 }
+  } else if (totalMarks >= 20 && totalMarks <= 39) {
+    result = { grade: 'D', gradePoints: 2.0 }
+  } else if (totalMarks >= 0 && totalMarks <= 19) {
+    result = { grade: 'F', gradePoints: 0.0 }
+  }
+  return result
+}
