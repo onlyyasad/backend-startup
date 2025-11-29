@@ -7,6 +7,12 @@ import { USER_ROLE } from '../user/user.constant'
 
 const router = Router()
 
+router.get(
+  '/',
+  auth(USER_ROLE.admin),
+  EnrolledCourseController.getEnrolledCourses,
+)
+
 router.post(
   '/create-enrolled-course',
   auth(USER_ROLE.student),

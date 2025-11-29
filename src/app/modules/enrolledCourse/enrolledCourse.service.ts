@@ -11,6 +11,12 @@ import { status as httpStatus } from 'http-status'
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model'
 import { Course } from '../course/course.model'
 import { Faculty } from '../faculty/faculty.model'
+import { calculateGradeAndPoints } from './enrolledCourse.utils'
+
+const getEnrolledCoursesFromDB = async (): Promise<TEnrolledCourse[]> => {
+  const enrolledCourses = await EnrolledCourse.find()
+  return enrolledCourses
+}
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -222,6 +228,21 @@ const updateEnrolledCourseMarksIntoDB = async (
     }
   }
 
+  if (courseMarks.finalTerm !== undefined) {
+    const { classTest1, classTest2, midTerm, finalTerm } =
+      isCourseBelongToFaculty.courseMarks
+    const totalMarks =
+      Math.ceil(classTest1 * 0.1) +
+      Math.ceil(midTerm * 0.3) +
+      Math.ceil(classTest2 * 0.1) +
+      Math.ceil(finalTerm * 0.5)
+
+    const result = calculateGradeAndPoints(totalMarks)
+    modifiedData['grade'] = result.grade
+    modifiedData['gradePoints'] = result.gradePoints
+    modifiedData['isCompleted'] = true
+  }
+
   const result = await EnrolledCourse.findByIdAndUpdate(
     isCourseBelongToFaculty._id,
     modifiedData,
@@ -234,4 +255,5 @@ const updateEnrolledCourseMarksIntoDB = async (
 export const EnrolledCourseServices = {
   createEnrolledCourseIntoDB,
   updateEnrolledCourseMarksIntoDB,
+  getEnrolledCoursesFromDB,
 }
