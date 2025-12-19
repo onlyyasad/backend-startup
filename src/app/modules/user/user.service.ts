@@ -17,6 +17,7 @@ import { Faculty } from '../faculty/faculty.model'
 import { Admin } from '../admin/admin.model'
 import { USER_ROLE } from './user.constant'
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary'
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model'
 
 const getMeFromDB = async (id: string, role: string) => {
   let result = null
@@ -52,18 +53,36 @@ const createStudentIntoDB = async (
     payload.admissionSemester,
   )
 
+  if (!admissionSemester) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid admission semester.')
+  }
+
+  const findDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  )
+
+  if (!findDepartment) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid academic department.')
+  }
+
+  const academicFacultyId = findDepartment.academicFaculty
+  payload.academicFaculty = academicFacultyId
+
   const session = await mongoose.startSession()
   try {
     session.startTransaction()
     userData.id = await generateStudentId(admissionSemester)
 
-    const imageName = `${userData.id}-${payload?.name?.firstName}-${Date.now()}`
+    if (file) {
+      const imageName = `${userData.id}-${payload?.name?.firstName}-${Date.now()}`
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const imageData: any = await sendImageToCloudinary(
-      imageName,
-      file?.path as string,
-    )
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const imageData: any = await sendImageToCloudinary(
+        imageName,
+        file?.path as string,
+      )
+      payload.profileImg = imageData?.secure_url
+    }
 
     //create a user (---- Transaction 1 -----)
     const newUser = await User.create([userData], { session })
@@ -76,7 +95,6 @@ const createStudentIntoDB = async (
     //set id, _id as user
     payload.id = newUser[0].id //embedding id
     payload.user = newUser[0]._id //reference id
-    payload.profileImg = imageData?.secure_url
 
     //create a student (---- Transaction 2 -----)
 
@@ -100,7 +118,11 @@ const createStudentIntoDB = async (
   }
 }
 
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (
+  file: IFile,
+  password: string,
+  payload: TFaculty,
+) => {
   //create a user object
   const userData: Partial<TUser> = {}
 
@@ -114,6 +136,17 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   try {
     session.startTransaction()
     userData.id = await generateFacultyId()
+
+    if (file) {
+      const imageName = `${userData.id}-${payload?.name?.firstName}-${Date.now()}`
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const imageData: any = await sendImageToCloudinary(
+        imageName,
+        file?.path as string,
+      )
+      payload.profileImg = imageData?.secure_url
+    }
 
     //create a user (---- Transaction 1 -----)
     const newUser = await User.create([userData], { session })
@@ -146,7 +179,11 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 }
 
-const createAdminIntoDB = async (password: string, payload: TFaculty) => {
+const createAdminIntoDB = async (
+  file: IFile,
+  password: string,
+  payload: TFaculty,
+) => {
   //create a user object
   const userData: Partial<TUser> = {}
 
@@ -160,6 +197,17 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   try {
     session.startTransaction()
     userData.id = await generateAdminId()
+
+    if (file) {
+      const imageName = `${userData.id}-${payload?.name?.firstName}-${Date.now()}`
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const imageData: any = await sendImageToCloudinary(
+        imageName,
+        file?.path as string,
+      )
+      payload.profileImg = imageData?.secure_url
+    }
 
     //create a user (---- Transaction 1 -----)
     const newUser = await User.create([userData], { session })
