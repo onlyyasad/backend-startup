@@ -132,6 +132,17 @@ const createFacultyIntoDB = async (
   userData.role = 'faculty'
   userData.email = payload.email
 
+  const findDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  )
+
+  if (!findDepartment) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid academic department.')
+  }
+
+  const academicFacultyId = findDepartment.academicFaculty
+  payload.academicFaculty = academicFacultyId
+
   const session = await mongoose.startSession()
   try {
     session.startTransaction()
