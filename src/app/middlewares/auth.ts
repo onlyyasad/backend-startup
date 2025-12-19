@@ -5,8 +5,9 @@ import { status as httpStatus } from 'http-status'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import config from '../config'
 import { User } from '../modules/user/user.model'
+import { TUserRole } from '../modules/user/user.interface'
 
-const auth = (...requiredRoles: string[]) => {
+const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization
 
