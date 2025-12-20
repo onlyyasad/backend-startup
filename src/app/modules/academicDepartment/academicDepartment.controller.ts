@@ -20,7 +20,7 @@ const createAcademicDepartment: RequestHandler = catchAsync(
 
 const getAcademicDepartments = catchAsync(async (req, res) => {
   const result =
-    await AcademicDepartmentServices.getAllAcademicDepartmentsFromDB()
+    await AcademicDepartmentServices.getAllAcademicDepartmentsFromDB(req.query)
 
   sendResponse(res, {
     success: true,
