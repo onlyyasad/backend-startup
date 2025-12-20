@@ -9,14 +9,7 @@ import { TFaculty } from './faculty.interface'
 
 const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
   const facultyQuery = new QueryBuilder(
-    Faculty.find()
-      .populate({
-        path: 'academicDepartment',
-        populate: {
-          path: 'academicFaculty',
-        },
-      })
-      .populate('academicFaculty'),
+    Faculty.find().populate('academicDepartment').populate('academicFaculty'),
     query,
   )
     .search(facultySearchableFields)
