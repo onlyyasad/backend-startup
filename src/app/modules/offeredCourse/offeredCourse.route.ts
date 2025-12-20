@@ -7,8 +7,28 @@ import { USER_ROLE } from '../user/user.constant'
 
 const router = Router()
 
-router.get('/', OfferedCourseController.getAllOfferedCourses)
-router.get('/:id', OfferedCourseController.getSingleOfferedCourse)
+router.get(
+  '/',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+  OfferedCourseController.getAllOfferedCourses,
+)
+
+router.get(
+  '/my-offered-courses',
+  auth(USER_ROLE.student),
+  OfferedCourseController.getMyOfferedCourses,
+)
+
+router.get(
+  '/:id',
+  auth(
+    USER_ROLE.superAdmin,
+    USER_ROLE.admin,
+    USER_ROLE.faculty,
+    USER_ROLE.student,
+  ),
+  OfferedCourseController.getSingleOfferedCourse,
+)
 router.post(
   '/create-offered-course',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
