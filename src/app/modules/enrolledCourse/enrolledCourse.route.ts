@@ -13,6 +13,12 @@ router.get(
   EnrolledCourseController.getEnrolledCourses,
 )
 
+router.get(
+  '/my-enrolled-courses',
+  auth(USER_ROLE.student),
+  EnrolledCourseController.getMyEnrolledCourses,
+)
+
 router.post(
   '/create-enrolled-course',
   auth(USER_ROLE.student),
