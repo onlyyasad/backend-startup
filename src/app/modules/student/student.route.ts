@@ -7,17 +7,31 @@ import { USER_ROLE } from '../user/user.constant'
 
 const router = express.Router()
 
-router.get('/', StudentControllers.getStudents)
+router.get(
+  '/',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  StudentControllers.getStudents,
+)
 router.get(
   '/:id',
-  auth(USER_ROLE.student, USER_ROLE.admin, USER_ROLE.faculty),
+  auth(
+    USER_ROLE.superAdmin,
+    USER_ROLE.student,
+    USER_ROLE.admin,
+    USER_ROLE.faculty,
+  ),
   StudentControllers.getSingleStudent,
 )
 router.patch(
   '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(studentValidations.updateStudentValidationSchema),
   StudentControllers.updateSingleStudent,
 )
-router.delete('/:id', StudentControllers.deleteSingleStudent)
+router.delete(
+  '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  StudentControllers.deleteSingleStudent,
+)
 
 export const StudentRoutes = router

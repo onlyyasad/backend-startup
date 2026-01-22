@@ -36,8 +36,13 @@ const createStudent: RequestHandler = catchAsync(async (req, res) => {
 
 const createFaculty: RequestHandler = catchAsync(async (req, res) => {
   const { password, faculty: facultyData } = req.body
+  const file = req.file as unknown as IFile
 
-  const result = await UserServices.createFacultyIntoDB(password, facultyData)
+  const result = await UserServices.createFacultyIntoDB(
+    file,
+    password,
+    facultyData,
+  )
 
   sendResponse(res, {
     success: true,
@@ -49,8 +54,9 @@ const createFaculty: RequestHandler = catchAsync(async (req, res) => {
 
 const createAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { password, admin: adminData } = req.body
+  const file = req.file as unknown as IFile
 
-  const result = await UserServices.createAdminIntoDB(password, adminData)
+  const result = await UserServices.createAdminIntoDB(file, password, adminData)
 
   sendResponse(res, {
     success: true,

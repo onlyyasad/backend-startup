@@ -4,13 +4,33 @@ import { EnrolledCourseServices } from './enrolledCourse.service'
 import { status as httpStatus } from 'http-status'
 
 const getEnrolledCourses = catchAsync(async (req, res) => {
-  const result = await EnrolledCourseServices.getEnrolledCoursesFromDB()
+  const result = await EnrolledCourseServices.getEnrolledCoursesFromDB(
+    req.query,
+  )
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Enrolled Courses retrieved successfully',
-    data: result,
+    meta: result.meta,
+    data: result.result,
+  })
+})
+
+const getMyEnrolledCourses = catchAsync(async (req, res) => {
+  const studentId = req.user.id
+
+  const result = await EnrolledCourseServices.getMyEnrolledCoursesFromDB(
+    studentId,
+    req.query,
+  )
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Enrolled Courses retrieved successfully',
+    meta: result.meta,
+    data: result.result,
   })
 })
 
@@ -48,4 +68,5 @@ export const EnrolledCourseController = {
   createEnrolledCourse,
   updateEnrolledCourseMarks,
   getEnrolledCourses,
+  getMyEnrolledCourses,
 }
