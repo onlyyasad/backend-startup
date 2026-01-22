@@ -18,10 +18,18 @@ const auth = (...requiredRoles: TUserRole[]) => {
       )
     }
 
-    const decoded = jwt.verify(
-      token,
-      config.jwt_access_secret as string,
-    ) as JwtPayload
+    let decoded: JwtPayload
+    try {
+      decoded = jwt.verify(
+        token,
+        config.jwt_access_secret as string,
+      ) as JwtPayload
+    } catch {
+      throw new AppError(
+        httpStatus.UNAUTHORIZED,
+        'You are not authorized to access this resource.',
+      )
+    }
 
     const { role, id, iat } = decoded
 
