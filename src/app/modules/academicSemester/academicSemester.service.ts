@@ -17,6 +17,11 @@ const getAllAcademicSemestersFromDB = async (
   query: Record<string, unknown>,
 ) => {
   const academicSemesterQuery = new QueryBuilder(AcademicSemester.find(), query)
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+
   const result = await academicSemesterQuery.modelQuery
   const meta = await academicSemesterQuery.countTotal()
 
