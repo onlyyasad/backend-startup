@@ -38,6 +38,7 @@ const getSingleStudentFromDB = async (id: string) => {
       },
     })
     .populate('admissionSemester')
+    .populate('academicFaculty')
   return result
 }
 

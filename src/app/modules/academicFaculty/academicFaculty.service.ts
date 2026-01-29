@@ -13,6 +13,10 @@ const getAllAcademicFacultiesFromDB = async (
   query: Record<string, unknown>,
 ) => {
   const academicFacultyQuery = new QueryBuilder(AcademicFaculty.find(), query)
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
   const result = await academicFacultyQuery.modelQuery
   const meta = await academicFacultyQuery.countTotal()
 
